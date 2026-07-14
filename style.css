@@ -1362,7 +1362,7 @@ grid-template-columns:repeat(2,1fr);
     gap:30px;
     margin-top:40px;
     flex-wrap:wrap;
-    transform: translateX(150px);
+    transform: translateX(90px);
 }
 
 .experience-card {
