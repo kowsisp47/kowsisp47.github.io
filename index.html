@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kowsalya Portfolio</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- ICONS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="bg-glow red"></div>
+<div class="bg-glow purple"></div>
+
+<nav>
+  <h1>Kowsalya S P</h1>
+  <div>
+    <a href="#home">🏠Home</a>
+    <a href="#about">👤About</a>
+    <a href="#skills">🛠Skills</a>
+    <a href="#experience">💼Experience</a>
+    <a href="#projects">💻Projects</a>
+    <a href="#certifications">🏆  Certifications</a>
+    <a href="#contact">📧Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<!-- HERO -->
+<section class="hero" id="home">
+
+  <!-- LEFT SIDE -->
+  <div class="hero-text">
+
+    <p class="hero-badge">
+      👋 Hello, I'm
+    </p>
+
+    <h2>
+      S.P. Kowsalya <br>
+
+      <span class="typing-wrapper">
+        <span id="typing"></span>
+      </span>
+    </h2>
+
+    <p class="desc">
+      Passionate Software Engineer focused on building scalable web applications,
+      AI-powered solutions, and user-friendly digital experiences.
+    </p>
+
+    <div class="hero-buttons">
+
+      <a href="./resume.pdf" target="_blank" class="btn">
+        <i class="fas fa-file-download"></i>
+        Resume
+      </a>
+
+      <a href="#contact" class="btn btn-outline">
+        <i class="fas fa-paper-plane"></i>
+        Contact Me
+      </a>
+
+    </div>
+
+    <div class="hero-social">
+
+      <a href="https://linkedin.com/in/kowsalya-73663a3b7" target="_blank">
+        <i class="fab fa-linkedin"></i>
+      </a>
+
+      <a href="https://github.com/kowsisp47" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+
+      <a href="mailto:kowsisp47@gmail.com">
+        <i class="fas fa-envelope"></i>
+      </a>
+
+    </div>
+
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="hero-image">
+
+      <div class="profile">
+          <img src="images/kowsiii.jpeg" alt="Kowsalya">
+      </div>
+
+  </div>
+
+</section>
+<!-- ABOUT -->
+<section class="section hidden about-section" id="about">
+
+  <div class="about-container">
+
+    <!-- LEFT -->
+    <div class="about-text">
+    <h2>About Me</h2>
+
+    <p>
+        I am an MCA graduate passionate about Software Engineering, Full-Stack Web Development, Python, and Artificial Intelligence.
+    </p>
+
+    <p>
+        I enjoy building scalable web applications, AI-powered solutions, and responsive user interfaces that solve real-world challenges.
+    </p>
+
+    <p>
+        Through internships and academic projects, I have gained hands-on experience in Full-Stack Development, Machine Learning, REST APIs, and modern web technologies.
+    </p>
+
+    <p class="highlight">
+        I am seeking Software Engineer, Full-Stack Developer, or Python Developer opportunities where I can contribute, learn, and grow.
+    </p>
+
+    <p class="career-goal">
+        Passionate about continuous learning, clean code, and building innovative software solutions.
+    </p>
+</div>
+
+    <!-- RIGHT -->
+    <div class="about-box">
+
+      <h3>Quick Info</h3>
+
+      <ul>
+        <li>🎓 MCA Graduate (CGPA: 8.4)</li>
+        <li>💻 Software Engineer Aspirant</li>
+        <li>🌐 Full-Stack Developer</li>
+        <li>🤖 AI & Machine Learning Enthusiast</li>
+        <li>🏆 Gold Medalist – B.Com (Computer Applications)</li>
+      </ul>
+
+      <div class="about-stats">
+
+        <div class="stat-card">
+          <h4>2+</h4>
+          <span>Internships</span>
+        </div>
+
+        <div class="stat-card">
+          <h4>3+</h4>
+          <span>Projects</span>
+        </div>
+
+        <div class="stat-card">
+          <h4>10+</h4>
+          <span>Certificates</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section class="section hidden" id="skills">
+
+    <h2>Skills</h2>
+
+    <!-- Skills Navigation -->
+    <div class="skills-nav">
+
+        <button class="tab-btn active" data-tab="languages">
+            <i class="fa-solid fa-code"></i>
+            <span>Languages</span>
+        </button>
+
+        <button class="tab-btn" data-tab="frontend">
+            <i class="fa-solid fa-laptop-code"></i>
+            <span>Frontend</span>
+        </button>
+
+        <button class="tab-btn" data-tab="backend">
+            <i class="fa-solid fa-server"></i>
+            <span>Backend</span>
+        </button>
+
+        <button class="tab-btn" data-tab="database">
+            <i class="fa-solid fa-database"></i>
+            <span>Database</span>
+        </button>
+
+        <button class="tab-btn" data-tab="aiml">
+            <i class="fa-solid fa-brain"></i>
+            <span>AI & ML</span>
+        </button>
+
+        <button class="tab-btn" data-tab="tools">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+            <span>Tools</span>
+        </button>
+
+    </div>
+
+    <!-- Languages -->
+    <div class="tab-content active" id="languages">
+
+        <div class="cards">
+            <div class="card"><i class="fa-brands fa-python"></i><p>Python</p></div>
+            <div class="card"><i class="fa-brands fa-java"></i><p>Java</p></div>
+            <div class="card"><i class="fa-solid fa-code"></i><p>C</p></div>
+        </div>
+
+    </div>
+
+    <!-- Frontend -->
+    <div class="tab-content" id="frontend">
+
+        <div class="cards">
+            <div class="card"><i class="fa-brands fa-html5"></i><p>HTML5</p></div>
+            <div class="card"><i class="fa-brands fa-css3-alt"></i><p>CSS3</p></div>
+            <div class="card"><i class="fa-brands fa-js"></i><p>JavaScript</p></div>
+            <div class="card"><i class="fa-brands fa-react"></i><p>React.js</p></div>
+            <div class="card"><i class="fa-brands fa-bootstrap"></i><p>Bootstrap</p></div>
+        </div>
+
+    </div>
+
+    <!-- Backend -->
+    <div class="tab-content" id="backend">
+
+        <div class="cards">
+            <div class="card"><i class="fa-brands fa-node-js"></i><p>Node.js</p></div>
+            <div class="card"><i class="fa-solid fa-server"></i><p>Express.js</p></div>
+            <div class="card"><i class="fa-solid fa-flask"></i><p>Flask</p></div>
+            <div class="card"><i class="fa-solid fa-plug"></i><p>REST APIs</p></div>
+        </div>
+
+    </div>
+
+    <!-- Database -->
+    <div class="tab-content" id="database">
+
+        <div class="cards">
+            <div class="card"><i class="fa-solid fa-database"></i><p>MySQL</p></div>
+            <div class="card"><i class="fa-solid fa-server"></i><p>MongoDB</p></div>
+            <div class="card"><i class="fa-solid fa-database"></i><p>SQLite</p></div>
+        </div>
+
+    </div>
+
+    <!-- AI & ML -->
+    <div class="tab-content" id="aiml">
+
+        <div class="cards">
+            <div class="card"><i class="fa-solid fa-brain"></i><p>TensorFlow</p></div>
+            <div class="card"><i class="fa-solid fa-eye"></i><p>OpenCV</p></div>
+            <div class="card"><i class="fa-solid fa-robot"></i><p>YOLO</p></div>
+            <div class="card"><i class="fa-solid fa-chart-line"></i><p>Scikit-learn</p></div>
+            <div class="card"><i class="fa-solid fa-table"></i><p>Pandas</p></div>
+            <div class="card"><i class="fa-solid fa-calculator"></i><p>NumPy</p></div>
+        </div>
+
+    </div>
+
+    <!-- Tools -->
+    <div class="tab-content" id="tools">
+
+        <div class="cards">
+            <div class="card"><i class="fa-brands fa-git-alt"></i><p>Git</p></div>
+            <div class="card"><i class="fa-brands fa-github"></i><p>GitHub</p></div>
+            <div class="card"><i class="fa-solid fa-code"></i><p>VS Code</p></div>
+            <div class="card"><i class="fa-brands fa-figma"></i><p>Figma</p></div>
+        </div>
+
+    </div>
+
+</section>
+<section id="experience" class="section">
+
+    <h2 class="section-title">Experience</h2>
+
+    <div class="experience-container">
+
+        <!-- Machine Learning Internship -->
+        <div class="experience-card">
+            <h3>🤖 Machine Learning Intern</h3>
+            <h4>Macvel Software Solutions</h4>
+
+            <p><strong>Duration:</strong> Feb 2026 – Apr 2026</p>
+
+            <p>
+                Developed a CNN-based road surface defect detection system for identifying potholes and road cracks.
+                Applied image preprocessing, trained deep learning models, and implemented three-level severity classification.
+            </p>
+
+            <p>
+                Integrated a YOLO-based detection API for model inference and evaluation, achieving approximately
+                <strong>95% accuracy</strong>.
+            </p>
+
+            <p>
+                <strong>Technologies:</strong>
+                Python, OpenCV, NumPy, TensorFlow, CNN, YOLO
+            </p>
+        </div>
+
+        <!-- Web Development Internship -->
+        <div class="experience-card">
+            <h3>💼 Web Development Intern</h3>
+            <h4>GETIN Technologies</h4>
+
+            <p><strong>Duration:</strong> May 2025 – June 2025</p>
+
+            <p>
+                Developed a RedBus-inspired web application for online bus ticket booking.
+                Implemented features including bus search, booking interface, and responsive UI using HTML, CSS, and JavaScript.
+                Built an Expense Tracker with CRUD operations, strengthening frontend development and problem-solving skills.
+            </p>
+
+            <p>
+                <strong>Technologies:</strong>
+                HTML, CSS, JavaScript
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="projects-section">
+
+  <div class="projects-heading-wrap">
+    <h2 class="projects-heading">Projects</h2>
+    <div class="projects-heading-underline"></div>
+  </div>
+
+  <div class="projects-grid">
+
+    <!-- ================= PROJECT 1 ================= -->
+    <article class="project-card" data-project="1">
+      <div class="card-face card-front">
+        <div class="card-banner banner-1">
+          <img class="banner-img" src="images/mediction.jpeg" alt="...">
+          <div class="banner-scrim"></div>
+        </div>
+        <span class="status-badge"><span class="status-dot"></span>Ongoing</span>
+        <button class="explore-btn" type="button" data-action="explore">👆 Click to Explore</button>
+      </div>
+      <div class="card-face card-back">
+        <h3 class="back-title">🏥 Mediction AI</h3>
+        <p class="back-desc">AI-powered medical reporting system that converts doctor voice input into structured medical reports with speech recognition, medical terminology correction, patient history management, AI-generated reports, PDF generation, and database storage.</p>
+        <div class="tech-pills">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">Flask</span>
+          <span class="tech-pill">SQLite</span>
+          <span class="tech-pill">Gemini AI</span>
+          <span class="tech-pill">REST API</span>
+        </div>
+        <div class="back-actions">
+          <a class="icon-btn"
+   href="https://github.com/kowsisp47/mediction-ai"
+   target="_blank"
+   rel="noopener">
+   🐙 GitHub
+</a>
+          <a class="icon-btn" href="mediction.html" target="_blank" rel="noopener">📄 Details</a>
+          <button class="back-btn" type="button" data-action="back">← Back</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- ================= PROJECT 2 ================= -->
+    <article class="project-card" data-project="2">
+      <div class="card-face card-front">
+        <div class="card-banner banner-2">
+          <img class="banner-img" src="images/road.jpeg" alt="...">
+          <div class="banner-scrim"></div>
+        </div>
+        <button class="explore-btn" type="button" data-action="explore">👆 Click to Explore</button>
+      </div>
+      <div class="card-face card-back">
+        <h3 class="back-title">🤖 Road Surface Defect Detection</h3>
+        <p class="back-desc">Developed a deep learning model for road crack and pothole detection using CNN and image preprocessing. Integrated YOLO-based inference and implemented three-level severity classification achieving approximately 95% detection accuracy.</p>
+        <div class="tech-pills">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">TensorFlow</span>
+          <span class="tech-pill">YOLO</span>
+          <span class="tech-pill">OpenCV</span>
+          <span class="tech-pill">NumPy</span>
+        </div>
+        <div class="back-actions">
+         <a class="icon-btn"
+   href="https://github.com/kowsisp47/CNN-Driven-Road-Defect-Detection-and-Severity-Evaluation"
+   target="_blank"
+   rel="noopener">
+   🐙 GitHub
+</a>
+          <a class="icon-btn" href="road.html" target="_blank" rel="noopener">📄 Details</a>
+          <button class="back-btn" type="button" data-action="back">← Back</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- ================= PROJECT 3 ================= -->
+    <article class="project-card" data-project="3">
+      <div class="card-face card-front">
+        <div class="card-banner banner-3">
+          <img class="banner-img" src="images/expense.jpeg" alt="...">
+          <div class="banner-scrim"></div>
+        </div>
+        <button class="explore-btn" type="button" data-action="explore">👆 Click to Explore</button>
+      </div>
+      <div class="card-face card-back">
+        <h3 class="back-title">💰 Expense Tracker</h3>
+        <p class="back-desc">Built a MERN Stack Expense Tracker with authentication, CRUD operations, dashboard, expense categorization, and responsive interface.</p>
+        <div class="tech-pills">
+          <span class="tech-pill">React</span>
+          <span class="tech-pill">Node.js</span>
+          <span class="tech-pill">Express.js</span>
+          <span class="tech-pill">MongoDB</span>
+        </div>
+        <div class="back-actions">
+<a class="icon-btn"
+   href="https://github.com/kowsisp47/expense-tracker-mern"
+   target="_blank"
+   rel="noopener">
+   🐙 GitHub
+</a>          <a class="icon-btn" href="expense.html" target="_blank" rel="noopener">📄 Details</a>
+          <button class="back-btn" type="button" data-action="back">← Back</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- ================= PROJECT 4 ================= -->
+    <article class="project-card" data-project="4">
+      <div class="card-face card-front">
+        <div class="card-banner banner-4">
+          <img class="banner-img" src="images/accounting.jpeg" alt="...">
+          <div class="banner-scrim"></div>
+        </div>
+        <button class="explore-btn" type="button" data-action="explore">👆 Click to Explore</button>
+      </div>
+      <div class="card-face card-back">
+        <h3 class="back-title">📊 Shop Management & Accounting System</h3>
+        <p class="back-desc">Desktop application inspired by Tally ERP for inventory management, customer records, billing, accounting, and database integration.</p>
+        <div class="tech-pills">
+          <span class="tech-pill">Java</span>
+          <span class="tech-pill">MySQL</span>
+          <span class="tech-pill">Java Swing</span>
+        </div>
+        <div class="back-actions">
+          <a class="icon-btn"
+   href="https://github.com/kowsisp47/Tally-project
+   "
+   target="_blank"
+   rel="noopener">
+   🐙 GitHub
+</a>
+          <a class="icon-btn" href="accounting.html" target="_blank" rel="noopener">📄 Details</a>
+          <button class="back-btn" type="button" data-action="back">← Back</button>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+
+<section id="certifications"class="certs-section">
+
+  <div class="certs-heading-wrap">
+    <h2 class="certs-heading">Certifications</h2>
+    <div class="certs-heading-underline"></div>
+  </div>
+
+  <div class="certs-grid">
+
+    <!-- FEATURED -->
+    <button type="button" class="cert-card cert-featured"
+      data-title="Tata GenAI Powered Data Analytics Job Simulation"
+      data-issuer="Forage"
+      data-date="June 2026"
+      data-desc="Completed tasks in exploratory data analysis, risk profiling, AI-based delinquency prediction, and data storytelling for a collections strategy."
+      data-image="images/Forge.jpg">
+      <div class="cert-top">
+        <span class="cert-icon">🏢</span>
+        <span class="cert-issuer">FORAGE</span>
+
+        <span class="cert-date">June 2026</span>
+      </div>
+      <h3 class="cert-title">Tata GenAI Powered Data Analytics Job Simulation</h3>
+      <p class="cert-desc">Completed tasks in exploratory data analysis, risk profiling, 
+        AI-based delinquency prediction, and data storytelling for a collections strategy</p>
+      <span class="cert-view-hint">View Certificate →</span>
+    </button>
+
+    <!-- HACKERRANK -->
+    <button type="button" class="cert-card"
+      data-title="HackerRank Certifications"
+      data-issuer="HackerRank"
+      data-date=""
+      data-desc="A set of verified HackerRank certifications covering core programming and problem-solving skills."
+      data-badges="Python,Problem Solving,Java,Software Engineer"
+      data-image="images/hacker.jpg">
+      <div class="cert-top">
+        <span class="cert-icon">💻</span>
+        <span class="cert-issuer">HACKERRANK</span>
+
+      </div>
+      <h3 class="cert-title">HackerRank Certifications</h3>
+      <div class="cert-badges">
+        <span class="cert-badge">Python</span>
+        <span class="cert-badge">Problem Solving</span>
+        <span class="cert-badge">Java</span>
+        <span class="cert-badge">Software Engineer</span>
+      </div>
+      <span class="cert-view-hint">View Certificate →</span>
+    </button>
+
+    <!-- MERN -->
+    <button type="button" class="cert-card"
+      data-title="Industry-Ready Full Stack (MERN)"
+      data-issuer="DCE Technologies"
+      data-date=""
+      data-desc="A hands-on program covering the MongoDB, Express.js, React, and Node.js stack for building full-stack web applications."
+      data-image="images/dce.jpg">
+      
+      <div class="cert-top">
+        <span class="cert-icon">🧩</span>
+        <span class="cert-issuer">DCE TECHNOLOGIES</span>
+
+      </div>
+      <h3 class="cert-title">Industry-Ready Full Stack (MERN)</h3>
+      <span class="cert-view-hint">View Certificate →</span>
+    </button>
+
+    <!-- MICROSOFT LEARNATHON -->
+    <button type="button" class="cert-card"
+      data-title="Microsoft Learnathon"
+      data-issuer="Microsoft"
+      data-date=""
+      data-desc="Participated in Microsoft's Learnathon program, building practical skills through guided, hands-on learning modules."
+      data-image="images/micro.jpg">
+      <div class="cert-top">
+        <span class="cert-icon">🪟</span>
+        <span class="cert-issuer">MICROSOFT</span>
+
+      </div>
+      <h3 class="cert-title">Microsoft Learnathon</h3>
+      <span class="cert-view-hint">View Certificate →</span>
+    </button>
+
+    <!-- NOVITECH -->
+    <button type="button" class="cert-card"
+      data-title="Data Analytics"
+      data-issuer="NoviTech"
+      data-date=""
+      data-desc="Completed a data analytics program covering core analytical techniques and tools."
+      data-image="images/Novi.jpeg">
+      <div class="cert-top">
+        <span class="cert-icon">📊</span>
+        <span class="cert-issuer">NOVITECH</span>
+
+      </div>
+      <h3 class="cert-title">Data Analytics</h3>
+      <span class="cert-view-hint">View Certificate →</span>
+    </button>
+
+    <!-- NPTEL -->
+    <button type="button" class="cert-card"
+      data-title="Graphic Design"
+      data-issuer="NPTEL"
+      data-date=""
+      data-desc="Completed an NPTEL course covering the fundamentals and principles of graphic design."
+      data-image="images/nptel.jpeg">
+      <div class="cert-top">
+        <span class="cert-icon">🎨</span>
+      <span class="cert-issuer">NPTEL</span>
+
+      </div>
+      <h3 class="cert-title">Graphic Design</h3>
+      <span class="cert-view-hint">View Certificate →</span>
+    </button>
+
+    <!-- COURSERA UX -->
+    <button type="button" class="cert-card"
+      data-title="UX Design"
+      data-issuer="Coursera"
+      data-date=""
+      data-desc="Completed a Coursera specialization covering user experience research, wireframing, and design principles."
+      data-image="images/cousera.jpeg">
+      <div class="cert-top">
+        <span class="cert-icon">🖌️</span>
+        <span class="cert-issuer">COURSERA</span>
+
+      </div>
+      <h3 class="cert-title">UX Design</h3>
+      <span class="cert-view-hint">View Certificate →</span>
+    </button>
+
+    <!-- WADHWANI -->
+    <button type="button" class="cert-card"
+      data-title="Self Presentation & Effective Speaking and Listening Skills"
+      data-issuer="Wadhwani Foundation"
+      data-date=""
+      data-desc="Completed Wadhwani Foundation microcertifications in Self Presentation and Effective Speaking and Listening Skills, developed through in-class and online training."      
+      data-image="images/Wadhwani2.jpg">
+      <div class="cert-top">
+        <span class="cert-icon">🌱</span>
+        <span class="cert-issuer">WADHWANI FOUNDATION</span>
+
+      </div>
+      <h3 class="cert-title">Employability &amp; Foundational Skills</h3>
+      <span class="cert-view-hint">View Certificate →</span>
+    </button>
+
+    <!-- PYTHON RECCSAR -->
+    <button type="button" class="cert-card"
+      data-title="Hands-on Python — Learn by Doing"
+      data-issuer="Reccsar Pvt. Ltd"
+      data-date=""
+      data-desc="Completed a practical, project-based Python course focused on learning through hands-on exercises."
+     data-image="images/Reccsar.jpg">>
+      <div class="cert-top">
+        <span class="cert-icon">🐍</span>
+        <span class="cert-issuer">RECCSAR PVT. LTD</span>
+
+      </div>
+      <h3 class="cert-title">Hands-on Python — Learn by Doing</h3>
+      <span class="cert-view-hint">View Certificate →</span>
+    </button>
+
+    <!-- MONGODB -->
+    <button type="button" class="cert-card"
+      data-title="MongoDB Basics for Students"
+      data-issuer="MongoDB Inc."
+      data-date=""
+      data-desc="Completed MongoDB Inc.'s foundational course on core database concepts and MongoDB basics."
+      data-image="images/mongo.jpg">
+      <div class="cert-top">
+        <span class="cert-icon">🍃</span>
+        <span class="cert-issuer">MONGODB INC.</span>
+
+      </div>
+      <h3 class="cert-title">MongoDB Basics for Students</h3>
+      <span class="cert-view-hint">View Certificate →</span>
+    </button>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     CERTIFICATE MODAL
+     ============================================================ -->
+<div class="cert-modal-backdrop" id="certModalBackdrop">
+  <div class="cert-modal" role="dialog" aria-modal="true" aria-labelledby="certModalTitle">
+    <button type="button" class="cert-modal-close" id="certModalClose" aria-label="Close">✕</button>
+
+    <div class="cert-modal-image" id="certModalImageWrap"></div>
+
+  </div>
+</div>
+<!-- CONTACT -->
+<section id="contact" class="section">
+    <h2 class="section-title">Let's Connect</h2>
+
+    <div class="contact-container">
+
+        <div class="contact-card">
+            <span class="contact-icon">
+                <i class="fas fa-envelope"></i>
+            </span>
+
+            <div>
+                <h3>Email</h3>
+                <a href="mailto:kowsisp47@gmail.com">
+                    kowsisp47@gmail.com
+                </a>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <span class="contact-icon">
+                <i class="fas fa-phone"></i>
+            </span>
+
+            <div>
+                <h3>Phone</h3>
+                <a href="tel:+919361563676">
+                    +91 93615 63676
+                </a>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <span class="contact-icon">
+                <i class="fab fa-linkedin"></i>
+            </span>
+
+            <div>
+                <h3>LinkedIn</h3>
+                <a href="https://linkedin.com/in/kowsalya-73663a3b7" target="_blank">
+                    View Profile
+                </a>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <span class="contact-icon">
+                <i class="fab fa-github"></i>
+            </span>
+
+            <div>
+                <h3>GitHub</h3>
+                <a href="https://github.com/kowsisp47" target="_blank">
+                    View GitHub
+                </a>
+            </div>
+        </div>
+
+    </div>
+</section>
+<footer class="footer">
+<div class="footer-card">
+    <div class="footer-glow"></div>
+
+    <div class="footer-container">
+
+        <h2>Kowsalya Developer</h2>
+
+        <p class="footer-desc">
+            Designed & Developed with Passion, Precision & Creativity.
+        </p>
+
+        <div class="footer-line"></div>
+
+        <p class="copyright">
+            © 2026 Kowsalya Developer • All Rights Reserved
+        </p>
+
+    </div>
+</div>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>

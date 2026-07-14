@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Road Surface Defect Detection — Project Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  /* ============================================================
+     TOKENS — shared with the Projects grid for visual consistency
+     ============================================================ */
+  :root{
+    --bg:            #0a0a12;
+    --surface:       rgba(255,255,255,0.035);
+    --surface-2:     rgba(255,255,255,0.05);
+    --border:        rgba(255,255,255,0.09);
+    --border-hover:  rgba(255,46,99,0.5);
+    --pink:          #ff2e63;
+    --pink-soft:     rgba(255,46,99,0.12);
+    --violet:        #6c2bd9;
+    --green:         #35e07a;
+    --text:          #f4f2f6;
+    --text-dim:      #a8a3b4;
+    --text-faint:    #6e6a7c;
+    --radius-lg:     22px;
+    --radius-md:     14px;
+    --radius-sm:     999px;
+    --font-display:  'Space Grotesk', sans-serif;
+    --font-body:     'Inter', sans-serif;
+    --font-mono:     'JetBrains Mono', monospace;
+    --ease:          cubic-bezier(0.22, 1, 0.36, 1);
+    --maxw:          1080px;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 10% 0%, rgba(108,43,217,0.14), transparent 55%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(255,46,99,0.10), transparent 50%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  a{ color: inherit; text-decoration: none; }
+
+  .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  .reveal{
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  }
+  .reveal.is-visible{ opacity: 1; transform: translateY(0); }
+
+  section{ padding: 88px 0; }
+  @media (max-width: 720px){ section{ padding: 60px 0; } }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--pink);
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .section-title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+    letter-spacing: -0.01em;
+    margin-top: 34px;
+  }
+
+  .section-underline{
+    width: 60px; height: 3px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--pink), rgba(255,46,99,0.1));
+    box-shadow: 0 0 14px rgba(255,46,99,0.5);
+    margin-bottom: 40px;
+  }
+
+  .section-lede{
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 640px;
+    margin-bottom: 36px;
+    line-height: 1.7;
+  }
+
+  .glass-card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  }
+  .glass-card:hover{
+    transform: translateY(-4px);
+    border-color: var(--border-hover);
+    box-shadow: 0 14px 34px rgba(255,46,99,0.14);
+  }
+
+  /* ============================================================
+     STICKY MINI NAV
+     ============================================================ */
+  .mini-nav{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10,10,18,0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mini-nav-inner{
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .mini-nav-brand{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .mini-nav-links{
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .mini-nav-links::-webkit-scrollbar{ display: none; }
+
+  .mini-nav-links a{
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-dim);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: color 0.25s var(--ease), background 0.25s var(--ease);
+  }
+  .mini-nav-links a:hover{ color: var(--text); background: var(--surface-2); }
+
+  .mini-nav-back{
+    flex-shrink: 0;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+  }
+  .mini-nav-back:hover{ border-color: var(--pink); background: var(--pink-soft); }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero{
+    position: relative;
+    padding: 0;
+    height: 62vh;
+    min-height: 420px;
+    max-height: 560px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  .hero-banner{
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 25% 20%, rgba(255,46,99,0.4), transparent 55%),
+      radial-gradient(circle at 80% 75%, rgba(108,43,217,0.35), transparent 55%),
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 30px),
+      linear-gradient(160deg, #22091a, #0a0710 75%);
+  }
+
+  .hero-banner-img{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+    mix-blend-mode: luminosity;
+  }
+
+  .hero-scrim{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10,10,18,0.15) 0%, rgba(10,10,18,0.55) 55%, var(--bg) 100%);
+  }
+
+  .hero-content{
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding-bottom: 44px;
+  }
+
+  .hero-status{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    background: rgba(20,10,16,0.6);
+    border: 1px solid rgba(255,255,255,0.16);
+    backdrop-filter: blur(10px);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+
+  .status-dot{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px rgba(53,224,122,0.9);
+  }
+
+  .hero-title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+  }
+
+  .hero-tagline{
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    color: var(--text-dim);
+    max-width: 560px;
+    line-height: 1.5;
+  }
+
+  /* ============================================================
+     QUICK INFO CARDS
+     ============================================================ */
+  .info-strip{
+    padding: 44px 0 0;
+  }
+
+  .info-grid{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+  }
+
+  @media (max-width: 900px){ .info-grid{ grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px){ .info-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+  .info-card{
+    padding: 18px 16px;
+    text-align: left;
+  }
+
+  .info-label{
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 8px;
+  }
+
+  .info-value{
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  /* ============================================================
+     PROSE SECTIONS (Overview / Problem Statement)
+     ============================================================ */
+  .prose-card{
+    padding: 32px 34px;
+  }
+
+  .prose-card p{
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--text-dim);
+  }
+
+  .prose-card p + p{ margin-top: 16px; }
+
+  /* ============================================================
+     OBJECTIVES
+     ============================================================ */
+  .objectives-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 640px){ .objectives-grid{ grid-template-columns: 1fr; } }
+
+  .objective-item{
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px 20px;
+  }
+
+  .objective-check{
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--pink-soft);
+    border: 1px solid rgba(255,46,99,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    color: var(--pink);
+  }
+
+  .objective-text{ font-size: 14px; color: var(--text); line-height: 1.5; padding-top: 3px; }
+
+  /* ============================================================
+     WORKFLOW (vertical flow)
+     ============================================================ */
+  .workflow{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .workflow-step{
+    width: 100%;
+    max-width: 420px;
+    padding: 16px 22px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .workflow-arrow{
+    font-family: var(--font-mono);
+    color: var(--pink);
+    font-size: 18px;
+    padding: 10px 0;
+    opacity: 0.8;
+  }
+
+  /* ============================================================
+     FEATURES
+     ============================================================ */
+  .features-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px){ .features-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .features-grid{ grid-template-columns: 1fr; } }
+
+  .feature-card{
+    padding: 24px 22px;
+  }
+
+  .feature-icon{ font-size: 26px; margin-bottom: 14px; display: block; }
+  .feature-title{ font-family: var(--font-display); font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+  .feature-desc{ font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ============================================================
+     TECH STACK
+     ============================================================ */
+  .stack-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px){ .stack-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .stack-grid{ grid-template-columns: 1fr; } }
+
+  .stack-card{ padding: 20px 20px 22px; }
+
+  .stack-cat{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 12px;
+  }
+
+  .stack-pills{ display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .stack-pill{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 6px 13px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255,46,99,0.4);
+    background: rgba(255,46,99,0.07);
+    color: #ffc0d2;
+  }
+
+  /* ============================================================
+     ARCHITECTURE (vertical flow, distinct styling from workflow)
+     ============================================================ */
+  .arch-flow{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .arch-node{
+    width: 100%;
+    max-width: 460px;
+    padding: 16px 22px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: linear-gradient(180deg, rgba(255,46,99,0.06), rgba(108,43,217,0.05));
+  }
+
+  .arch-node.emphasis{
+    border-color: rgba(255,46,99,0.55);
+    box-shadow: 0 0 22px rgba(255,46,99,0.18);
+  }
+
+  .arch-arrow{
+    color: var(--pink);
+    font-size: 16px;
+    padding: 8px 0;
+    opacity: 0.75;
+  }
+
+  /* ============================================================
+     IMPLEMENTATION MODULES
+     ============================================================ */
+  .modules-list{ display: flex; flex-direction: column; gap: 14px; }
+
+  .module-item{
+    display: flex;
+    gap: 18px;
+    padding: 20px 22px;
+    align-items: flex-start;
+  }
+
+  .module-index{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--pink);
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .module-body h4{
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .module-body p{
+    font-size: 13.3px;
+    color: var(--text-dim);
+    line-height: 1.65;
+  }
+
+  /* ============================================================
+     CHALLENGES
+     ============================================================ */
+  .challenges-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 640px){ .challenges-grid{ grid-template-columns: 1fr; } }
+
+  .challenge-card{ padding: 22px 22px; }
+  .challenge-title{ font-family: var(--font-display); font-weight: 600; font-size: 14.5px; margin-bottom: 8px; display:flex; align-items:center; gap:8px; }
+  .challenge-desc{ font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ============================================================
+     CONTRIBUTIONS
+     ============================================================ */
+  .contrib-list{ display: flex; flex-direction: column; gap: 10px; }
+
+  .contrib-item{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    font-size: 13.8px;
+  }
+
+  .contrib-dot{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--pink);
+    box-shadow: 0 0 8px rgba(255,46,99,0.7);
+    flex-shrink: 0;
+  }
+
+  /* ============================================================
+     SCREENSHOTS
+     ============================================================ */
+  .screens-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 640px){ .screens-grid{ grid-template-columns: 1fr; } }
+
+  .screen-card{
+    aspect-ratio: 16 / 10;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 14px),
+      linear-gradient(150deg, #1a0a16, #0c0810);
+  }
+
+  .screen-card img{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .screen-label{
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: var(--text-faint);
+  }
+
+  .screen-label-icon{ font-size: 22px; display: block; margin-bottom: 8px; opacity: 0.7; }
+  .screen-label-text{ font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.04em; }
+
+  /* ============================================================
+     FUTURE IMPROVEMENTS
+     ============================================================ */
+  .future-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 900px){ .future-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .future-grid{ grid-template-columns: 1fr; } }
+
+  .future-card{
+    padding: 18px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+
+  .future-icon{ font-size: 18px; }
+
+  /* ============================================================
+     KEY LEARNINGS
+     ============================================================ */
+  .learnings-wrap{ display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .learning-pill{
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .learning-pill:hover{
+    border-color: var(--pink);
+    background: var(--pink-soft);
+    transform: translateY(-2px);
+  }
+
+  /* ============================================================
+     GITHUB CTA
+     ============================================================ */
+  .github-card{
+    padding: 46px 40px;
+    text-align: center;
+    background: linear-gradient(160deg, rgba(255,46,99,0.09), rgba(108,43,217,0.07));
+    border: 1px solid rgba(255,46,99,0.3);
+  }
+
+  .github-card h3{
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .github-card p{
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 26px;
+  }
+
+  .github-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 28px;
+    border-radius: var(--radius-sm);
+    background: var(--pink);
+    color: #150710;
+    font-weight: 600;
+    font-size: 14.5px;
+    box-shadow: 0 0 26px rgba(255,46,99,0.4);
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  }
+  .github-btn:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 0 36px rgba(255,46,99,0.55);
+  }
+
+  /* ============================================================
+     BACK TO PORTFOLIO (footer)
+     ============================================================ */
+  .back-footer{
+    padding: 50px 0 90px;
+    text-align: center;
+  }
+
+  .back-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .back-link:hover{
+    border-color: var(--pink);
+    background: var(--pink-soft);
+    transform: translateY(-2px);
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     STICKY MINI NAVIGATION
+     ============================================================ -->
+<nav class="mini-nav">
+  <div class="mini-nav-inner">
+    <span class="mini-nav-brand">🤖 Road Defect Detection</span>
+    <div class="mini-nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#features">Features</a>
+      <a href="#stack">Stack</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#contributions">Contributions</a>
+      <a href="#github">GitHub</a>
+    </div>
+    <a class="mini-nav-back" href="index.html">← Portfolio</a>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero">
+  <div class="hero-banner">
+    <!-- Replace with your own screenshot: <img class="hero-banner-img" src="YOUR-IMAGE.jpg" alt=""> -->
+  </div>
+  <div class="hero-scrim"></div>
+  <div class="hero-content wrap">
+    <span class="hero-status" style="background: rgba(20,16,10,0.6);"><span class="status-dot" style="background:#a8a3b4; box-shadow:none;"></span>Completed</span>
+    <h1 class="hero-title">🤖 CNN-Driven Road Surface Defect Detection</h1>
+    <p class="hero-tagline">A deep learning system that detects potholes and cracks in road images, localizes them with bounding boxes, and classifies severity automatically.</p>
+  </div>
+</header>
+
+<!-- ============================================================
+     QUICK INFO STRIP
+     ============================================================ -->
+<section class="info-strip wrap">
+  <div class="info-grid">
+    <div class="glass-card info-card">
+      <span class="info-label">Duration</span>
+      <span class="info-value">Jan 2026 – Mar 2026</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Role</span>
+      <span class="info-value">Machine Learning Developer</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Project Type</span>
+      <span class="info-value">Academic Project</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Category</span>
+      <span class="info-value">Computer Vision</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Technology</span>
+      <span class="info-value">Python + TensorFlow</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Status</span>
+      <span class="info-value">Completed</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROJECT OVERVIEW
+     ============================================================ -->
+<section id="overview" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Project Overview</h2>
+    <div class="section-underline"></div>
+    <div class="glass-card prose-card">
+      <p>This project is a deep learning system that automatically detects and classifies road surface defects — potholes and cracks — directly from road images. Given an input photo, the model identifies whether a defect is present, determines what type it is, draws a bounding box around its exact location in the image, and assigns a severity level of low, moderate, or high based on the extent of the damage.</p>
+      <p>I built this to explore a real infrastructure problem: road damage assessment is still largely done by manual inspection, which is slow, inconsistent, and doesn't scale across large municipal road networks. A CNN-based detection pipeline can process images far faster than a human inspector while producing consistent, repeatable severity ratings.</p>
+      <p>It's aimed at municipal road maintenance teams, civic tech applications, and researchers exploring automated infrastructure monitoring — anyone who needs a fast, visual, and quantifiable way to triage which roads need repair first.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROBLEM STATEMENT
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Problem Statement</h2>
+    <div class="section-underline"></div>
+    <div class="glass-card prose-card">
+      <p>Municipal road networks are typically inspected on foot or by slow-moving survey vehicles, with defects logged manually by an inspector's judgment. This process is time-consuming, expensive to scale, and highly subjective — two inspectors looking at the same pothole may rate its severity differently.</p>
+      <p>Because inspection is slow, damage often goes unreported for long stretches of time, allowing minor cracks to worsen into large potholes before repair crews are even aware of them. Without a consistent, quantifiable severity scale, maintenance teams also struggle to prioritize which roads need urgent attention versus routine upkeep.</p>
+      <p>An automated, image-based detection system solves both problems at once: it can process large volumes of road imagery quickly, and because the severity classification is model-driven rather than subjective, every road gets rated on the same consistent scale.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     OBJECTIVES
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Objectives</h2>
+    <div class="section-underline"></div>
+    <div class="objectives-grid">
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Detect potholes and cracks automatically from road images</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Identify road type and defect category from visual features</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Localize each defect with a bounding box on the image</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Classify severity as Low, Moderate, or High</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Achieve high detection accuracy across varied road conditions</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Build a pipeline fast enough for practical, large-scale use</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROJECT WORKFLOW
+     ============================================================ -->
+<section id="workflow" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Project Workflow</h2>
+    <div class="section-underline"></div>
+    <div class="workflow">
+      <div class="glass-card workflow-step">📷 Road Image Upload</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">🧹 Image Preprocessing</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">🧠 CNN Feature Extraction</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">🎯 YOLO-Based Defect Detection</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">📊 Severity Classification (Low / Moderate / High)</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">🖼️ Bounding Box Output</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURES
+     ============================================================ -->
+<section id="features" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Features</h2>
+    <div class="section-underline"></div>
+    <div class="features-grid">
+      <div class="glass-card feature-card">
+        <span class="feature-icon">🕳️</span>
+        <h4 class="feature-title">Pothole Detection</h4>
+        <p class="feature-desc">Identifies potholes in a road image and flags their exact location.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">🪨</span>
+        <h4 class="feature-title">Crack Detection</h4>
+        <p class="feature-desc">Detects surface cracks and distinguishes them from potholes.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">🛣️</span>
+        <h4 class="feature-title">Road Type Identification</h4>
+        <p class="feature-desc">Classifies the road surface type visible in the uploaded image.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">🖼️</span>
+        <h4 class="feature-title">Bounding Box Visualization</h4>
+        <p class="feature-desc">Draws a bounding box directly on the image around every defect found.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">📊</span>
+        <h4 class="feature-title">Severity Classification</h4>
+        <p class="feature-desc">Rates each detected defect as Low, Moderate, or High severity.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">🎯</span>
+        <h4 class="feature-title">~95% Detection Accuracy</h4>
+        <p class="feature-desc">Achieves high accuracy across varied lighting and road conditions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TECHNOLOGY STACK
+     ============================================================ -->
+<section id="stack" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Technology Stack</h2>
+    <div class="section-underline"></div>
+    <div class="stack-grid">
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Programming Language</span>
+        <div class="stack-pills"><span class="stack-pill">Python</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Deep Learning</span>
+        <div class="stack-pills"><span class="stack-pill">TensorFlow</span><span class="stack-pill">YOLO</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Computer Vision</span>
+        <div class="stack-pills"><span class="stack-pill">OpenCV</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Data Processing</span>
+        <div class="stack-pills"><span class="stack-pill">NumPy</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Model Type</span>
+        <div class="stack-pills"><span class="stack-pill">CNN</span><span class="stack-pill">Object Detection</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Tools</span>
+        <div class="stack-pills"><span class="stack-pill">Git</span><span class="stack-pill">GitHub</span><span class="stack-pill">Jupyter</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SYSTEM ARCHITECTURE
+     ============================================================ -->
+<section id="architecture" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">System Architecture</h2>
+    <div class="section-underline"></div>
+    <div class="arch-flow">
+      <div class="arch-node">Road Image Input</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">OpenCV Preprocessing</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node emphasis">CNN Feature Extraction</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node emphasis">YOLO Detection Head</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Severity Classifier</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Bounding Box Renderer</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Annotated Output Image</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     IMPLEMENTATION
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Implementation</h2>
+    <div class="section-underline"></div>
+    <div class="modules-list">
+      <div class="glass-card module-item">
+        <span class="module-index">01</span>
+        <div class="module-body">
+          <h4>Preprocessing Module</h4>
+          <p>Resizes, normalizes, and denoises incoming road images using OpenCV so the model receives consistent input regardless of source resolution or lighting.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">02</span>
+        <div class="module-body">
+          <h4>Feature Extraction Module</h4>
+          <p>A convolutional neural network learns visual patterns distinguishing cracks, potholes, and healthy road surface from the preprocessed image.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">03</span>
+        <div class="module-body">
+          <h4>Detection Module</h4>
+          <p>A YOLO-based detection head localizes each defect in the image and outputs a bounding box with a class label for every instance found.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">04</span>
+        <div class="module-body">
+          <h4>Severity Classification Module</h4>
+          <p>Evaluates each detected defect's size and shape characteristics to assign a Low, Moderate, or High severity rating.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">05</span>
+        <div class="module-body">
+          <h4>Visualization Module</h4>
+          <p>Renders the final bounding boxes and severity labels directly onto the original image for easy visual interpretation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHALLENGES FACED
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Challenges Faced</h2>
+    <div class="section-underline"></div>
+    <div class="challenges-grid">
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">🎯 Detection Accuracy</h4>
+        <p class="challenge-desc">Distinguishing shallow cracks from shadows or surface staining required careful tuning of the CNN's feature layers.</p>
+      </div>
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">📊 Severity Calibration</h4>
+        <p class="challenge-desc">Defining a consistent, defensible boundary between Low, Moderate, and High severity took multiple rounds of testing against labeled examples.</p>
+      </div>
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">🖼️ Bounding Box Precision</h4>
+        <p class="challenge-desc">Getting the YOLO detection head to tightly localize irregular pothole shapes, rather than oversized or misaligned boxes, required extra training iterations.</p>
+      </div>
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">🌦️ Varying Image Conditions</h4>
+        <p class="challenge-desc">Road photos taken in different lighting, angles, and weather needed a robust preprocessing step to keep accuracy consistent.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MY CONTRIBUTIONS
+     ============================================================ -->
+<section id="contributions" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">My Contributions</h2>
+    <div class="section-underline"></div>
+    <div class="glass-card" style="padding: 24px 26px;">
+      <div class="contrib-list">
+        <div class="contrib-item"><span class="contrib-dot"></span>Collected and preprocessed the road image dataset used for training</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Designed and trained the CNN model for defect feature extraction</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Integrated YOLO-based inference for defect localization</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Implemented the three-level severity classification logic</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Built the bounding box visualization output pipeline</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Evaluated and tuned the model to reach ~95% detection accuracy</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCREENSHOTS
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Screenshots</h2>
+    <div class="section-underline"></div>
+    <p class="section-lede">The detection output below shows how bounding boxes and severity labels are rendered — swap the remaining placeholders with real screenshots once available.</p>
+    <div class="screens-grid">
+      <div class="glass-card screen-card" style="aspect-ratio: 16/10; background: linear-gradient(150deg, #24140f, #14100c);">
+        <svg viewBox="0 0 400 250" style="width:100%; height:100%; position:absolute; inset:0;">
+          <rect width="400" height="250" fill="#221812"/>
+          <path d="M0 180 L400 165 L400 250 L0 250 Z" fill="#2e2019"/>
+          <path d="M40 210 Q90 195 150 205 Q170 208 165 195 Q150 185 100 190 Q60 195 40 210 Z" fill="#0d0906" opacity="0.85"/>
+          <path d="M230 150 L245 155 L260 175 L275 200 L268 210 L250 190 L235 165 Z" fill="#0d0906" opacity="0.75"/>
+          <rect x="28" y="180" width="150" height="42" fill="none" stroke="#ff2e63" stroke-width="2" rx="3"/>
+          <text x="28" y="176" font-family="JetBrains Mono, monospace" font-size="10" fill="#ff2e63">POTHOLE · HIGH</text>
+          <rect x="222" y="142" width="60" height="76" fill="none" stroke="#ffb84d" stroke-width="2" rx="3"/>
+          <text x="222" y="136" font-family="JetBrains Mono, monospace" font-size="10" fill="#ffb84d">CRACK · MODERATE</text>
+        </svg>
+      </div>
+      <div class="glass-card screen-card">
+        <div class="screen-label"><span class="screen-label-icon">📷</span><span class="screen-label-text">UPLOAD INTERFACE</span></div>
+      </div>
+      <div class="glass-card screen-card">
+        <div class="screen-label"><span class="screen-label-icon">📊</span><span class="screen-label-text">SEVERITY REPORT</span></div>
+      </div>
+      <div class="glass-card screen-card">
+        <div class="screen-label"><span class="screen-label-icon">🧪</span><span class="screen-label-text">MODEL EVALUATION</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FUTURE IMPROVEMENTS
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Future Improvements</h2>
+    <div class="section-underline"></div>
+    <div class="future-grid">
+      <div class="glass-card future-card"><span class="future-icon">☁️</span>Cloud Deployment</div>
+      <div class="glass-card future-card"><span class="future-icon">📱</span>Mobile Dash-Cam App</div>
+      <div class="glass-card future-card"><span class="future-icon">🗺️</span>GPS-Tagged Reporting</div>
+      <div class="glass-card future-card"><span class="future-icon">🎥</span>Real-Time Video Detection</div>
+      <div class="glass-card future-card"><span class="future-icon">🏛️</span>Municipal Dashboard</div>
+      <div class="glass-card future-card"><span class="future-icon">📈</span>Damage Progression Tracking</div>
+      <div class="glass-card future-card"><span class="future-icon">🔧</span>Repair Priority Scoring</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     KEY LEARNINGS
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Key Learnings</h2>
+    <div class="section-underline"></div>
+    <div class="learnings-wrap">
+      <span class="learning-pill">Python</span>
+      <span class="learning-pill">TensorFlow</span>
+      <span class="learning-pill">Convolutional Neural Networks</span>
+      <span class="learning-pill">YOLO Object Detection</span>
+      <span class="learning-pill">Image Preprocessing</span>
+      <span class="learning-pill">Model Evaluation</span>
+      <span class="learning-pill">Dataset Curation</span>
+      <span class="learning-pill">Computer Vision Fundamentals</span>
+      <span class="learning-pill">Problem Solving</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     GITHUB REPOSITORY
+     ============================================================ -->
+<section id="github" class="wrap">
+  <div class="reveal glass-card github-card">
+    <h3>View the Full Source Code</h3>
+    <p>Explore the complete implementation, including the CNN training pipeline, YOLO integration, and severity classification logic.</p>
+    <a class="github-btn" href="https://github.com/kowsisp47/CNN-Driven-Road-Defect-Detection-and-Severity-Evaluation" target="_blank" rel="noopener">🐙 View Source Code</a>
+  </div>
+</section>
+
+<!-- ============================================================
+     BACK TO PORTFOLIO
+     ============================================================ -->
+<footer class="back-footer wrap">
+  <a class="back-link" href="index.html">⬅ Back to Portfolio</a>
+</footer>
+
+<script>
+  // ============================================================
+  // Scroll-reveal animation for each section — vanilla JS,
+  // no dependencies. Adds .is-visible once a section enters
+  // the viewport so the CSS transition can fade/slide it in.
+  // ============================================================
+  (function initScrollReveal(){
+    const revealEls = document.querySelectorAll('.reveal');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    revealEls.forEach((el) => observer.observe(el));
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expense Tracker — Project Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  /* ============================================================
+     TOKENS — shared with the Projects grid for visual consistency
+     ============================================================ */
+  :root{
+    --bg:            #0a0a12;
+    --surface:       rgba(255,255,255,0.035);
+    --surface-2:     rgba(255,255,255,0.05);
+    --border:        rgba(255,255,255,0.09);
+    --border-hover:  rgba(255,46,99,0.5);
+    --pink:          #ff2e63;
+    --pink-soft:     rgba(255,46,99,0.12);
+    --violet:        #6c2bd9;
+    --green:         #35e07a;
+    --text:          #f4f2f6;
+    --text-dim:      #a8a3b4;
+    --text-faint:    #6e6a7c;
+    --radius-lg:     22px;
+    --radius-md:     14px;
+    --radius-sm:     999px;
+    --font-display:  'Space Grotesk', sans-serif;
+    --font-body:     'Inter', sans-serif;
+    --font-mono:     'JetBrains Mono', monospace;
+    --ease:          cubic-bezier(0.22, 1, 0.36, 1);
+    --maxw:          1080px;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 10% 0%, rgba(108,43,217,0.14), transparent 55%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(255,46,99,0.10), transparent 50%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  a{ color: inherit; text-decoration: none; }
+
+  .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  .reveal{
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  }
+  .reveal.is-visible{ opacity: 1; transform: translateY(0); }
+
+  section{ padding: 88px 0; }
+  @media (max-width: 720px){ section{ padding: 60px 0; } }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--pink);
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .section-title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+    letter-spacing: -0.01em;
+    margin-top: 21px;
+  }
+
+  .section-underline{
+    width: 60px; height: 3px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--pink), rgba(255,46,99,0.1));
+    box-shadow: 0 0 14px rgba(255,46,99,0.5);
+    margin-bottom: 40px;
+  }
+
+  .section-lede{
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 640px;
+    margin-bottom: 36px;
+    line-height: 1.7;
+  }
+
+  .glass-card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  }
+  .glass-card:hover{
+    transform: translateY(-4px);
+    border-color: var(--border-hover);
+    box-shadow: 0 14px 34px rgba(255,46,99,0.14);
+  }
+
+  /* ============================================================
+     STICKY MINI NAV
+     ============================================================ */
+  .mini-nav{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10,10,18,0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mini-nav-inner{
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .mini-nav-brand{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .mini-nav-links{
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .mini-nav-links::-webkit-scrollbar{ display: none; }
+
+  .mini-nav-links a{
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-dim);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: color 0.25s var(--ease), background 0.25s var(--ease);
+  }
+  .mini-nav-links a:hover{ color: var(--text); background: var(--surface-2); }
+
+  .mini-nav-back{
+    flex-shrink: 0;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+  }
+  .mini-nav-back:hover{ border-color: var(--pink); background: var(--pink-soft); }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero{
+    position: relative;
+    padding: 0;
+    height: 62vh;
+    min-height: 420px;
+    max-height: 560px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  .hero-banner{
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 25% 20%, rgba(255,46,99,0.4), transparent 55%),
+      radial-gradient(circle at 80% 75%, rgba(108,43,217,0.35), transparent 55%),
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 30px),
+      linear-gradient(160deg, #22091a, #0a0710 75%);
+  }
+
+  .hero-banner-img{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+    mix-blend-mode: luminosity;
+  }
+
+  .hero-scrim{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10,10,18,0.15) 0%, rgba(10,10,18,0.55) 55%, var(--bg) 100%);
+  }
+
+  .hero-content{
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding-bottom: 44px;
+  }
+
+  .hero-status{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    background: rgba(20,10,16,0.6);
+    border: 1px solid rgba(255,255,255,0.16);
+    backdrop-filter: blur(10px);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+
+  .status-dot{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px rgba(53,224,122,0.9);
+  }
+
+  .hero-title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 66px;
+  }
+
+  .hero-tagline{
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    color: var(--text-dim);
+    max-width: 560px;
+    line-height: 1.5;
+    margin-bottom: 26px;
+  }
+
+
+  /* ============================================================
+     QUICK INFO CARDS
+     ============================================================ */
+  .info-strip{
+    padding: 44px 0 0;
+  }
+
+  .info-grid{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+  }
+
+  @media (max-width: 900px){ .info-grid{ grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px){ .info-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+  .info-card{
+    padding: 18px 16px;
+    text-align: left;
+  }
+
+  .info-label{
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 18px;
+  }
+
+  .info-value{
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  /* ============================================================
+     PROSE SECTIONS (Overview / Problem Statement)
+     ============================================================ */
+  .prose-card{
+    padding: 32px 34px;
+  }
+
+  .prose-card p{
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--text-dim);
+  }
+
+  .prose-card p + p{ margin-top: 16px; }
+
+  /* ============================================================
+     OBJECTIVES
+     ============================================================ */
+  .objectives-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 640px){ .objectives-grid{ grid-template-columns: 1fr; } }
+
+  .objective-item{
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px 20px;
+  }
+
+  .objective-check{
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--pink-soft);
+    border: 1px solid rgba(255,46,99,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    color: var(--pink);
+  }
+
+  .objective-text{ font-size: 14px; color: var(--text); line-height: 1.5; padding-top: 3px; }
+
+  /* ============================================================
+     WORKFLOW (vertical flow)
+     ============================================================ */
+  .workflow{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .workflow-step{
+    width: 100%;
+    max-width: 420px;
+    padding: 16px 22px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .workflow-arrow{
+    font-family: var(--font-mono);
+    color: var(--pink);
+    font-size: 18px;
+    padding: 10px 0;
+    opacity: 0.8;
+  }
+
+  /* ============================================================
+     FEATURES
+     ============================================================ */
+  .features-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px){ .features-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .features-grid{ grid-template-columns: 1fr; } }
+
+  .feature-card{
+    padding: 24px 22px;
+  }
+
+  .feature-icon{ font-size: 26px; margin-bottom: 14px; display: block; }
+  .feature-title{ font-family: var(--font-display); font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+  .feature-desc{ font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ============================================================
+     TECH STACK
+     ============================================================ */
+  .stack-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px){ .stack-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .stack-grid{ grid-template-columns: 1fr; } }
+
+  .stack-card{ padding: 20px 20px 22px; }
+
+  .stack-cat{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 12px;
+  }
+
+  .stack-pills{ display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .stack-pill{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 6px 13px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255,46,99,0.4);
+    background: rgba(255,46,99,0.07);
+    color: #ffc0d2;
+  }
+
+  /* ============================================================
+     ARCHITECTURE (vertical flow, distinct styling from workflow)
+     ============================================================ */
+  .arch-flow{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .arch-node{
+    width: 100%;
+    max-width: 460px;
+    padding: 16px 22px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: linear-gradient(180deg, rgba(255,46,99,0.06), rgba(108,43,217,0.05));
+  }
+
+  .arch-node.emphasis{
+    border-color: rgba(255,46,99,0.55);
+    box-shadow: 0 0 22px rgba(255,46,99,0.18);
+  }
+
+  .arch-arrow{
+    color: var(--pink);
+    font-size: 16px;
+    padding: 8px 0;
+    opacity: 0.75;
+  }
+
+  /* ============================================================
+     IMPLEMENTATION MODULES
+     ============================================================ */
+  .modules-list{ display: flex; flex-direction: column; gap: 14px; }
+
+  .module-item{
+    display: flex;
+    gap: 18px;
+    padding: 20px 22px;
+    align-items: flex-start;
+  }
+
+  .module-index{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--pink);
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .module-body h4{
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .module-body p{
+    font-size: 13.3px;
+    color: var(--text-dim);
+    line-height: 1.65;
+  }
+
+  /* ============================================================
+     CHALLENGES
+     ============================================================ */
+  .challenges-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 640px){ .challenges-grid{ grid-template-columns: 1fr; } }
+
+  .challenge-card{ padding: 22px 22px; }
+  .challenge-title{ font-family: var(--font-display); font-weight: 600; font-size: 14.5px; margin-bottom: 8px; display:flex; align-items:center; gap:8px; }
+  .challenge-desc{ font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ============================================================
+     CONTRIBUTIONS
+     ============================================================ */
+  .contrib-list{ display: flex; flex-direction: column; gap: 10px; }
+
+  .contrib-item{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    font-size: 13.8px;
+  }
+
+  .contrib-dot{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--pink);
+    box-shadow: 0 0 8px rgba(255,46,99,0.7);
+    flex-shrink: 0;
+  }
+
+  /* ============================================================
+     SCREENSHOTS
+     ============================================================ */
+  /* ============================================================
+     FUTURE IMPROVEMENTS
+     ============================================================ */
+  .future-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 900px){ .future-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .future-grid{ grid-template-columns: 1fr; } }
+
+  .future-card{
+    padding: 18px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+
+  .future-icon{ font-size: 18px; }
+
+  /* ============================================================
+     KEY LEARNINGS
+     ============================================================ */
+  .learnings-wrap{ display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .learning-pill{
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .learning-pill:hover{
+    border-color: var(--pink);
+    background: var(--pink-soft);
+    transform: translateY(-2px);
+  }
+
+  /* ============================================================
+     GITHUB CTA
+     ============================================================ */
+  .github-card{
+    padding: 46px 40px;
+    text-align: center;
+    background: linear-gradient(160deg, rgba(255,46,99,0.09), rgba(108,43,217,0.07));
+    border: 1px solid rgba(255,46,99,0.3);
+  }
+
+  .github-card h3{
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .github-card p{
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 26px;
+  }
+
+  .github-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 28px;
+    border-radius: var(--radius-sm);
+    background: var(--pink);
+    color: #150710;
+    font-weight: 600;
+    font-size: 14.5px;
+    box-shadow: 0 0 26px rgba(255,46,99,0.4);
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  }
+  .github-btn:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 0 36px rgba(255,46,99,0.55);
+  }
+
+  /* ============================================================
+     BACK TO PORTFOLIO (footer)
+     ============================================================ */
+  .back-footer{
+    padding: 50px 0 90px;
+    text-align: center;
+  }
+
+  .back-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .back-link:hover{
+    border-color: var(--pink);
+    background: var(--pink-soft);
+    transform: translateY(-2px);
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     STICKY MINI NAVIGATION
+     ============================================================ -->
+<nav class="mini-nav">
+  <div class="mini-nav-inner">
+    <span class="mini-nav-brand">💰 Expense Tracker</span>
+    <div class="mini-nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#features">Features</a>
+      <a href="#stack">Stack</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#contributions">Contributions</a>
+      <a href="#github">GitHub</a>
+    </div>
+    <a class="mini-nav-back" href="index.html">← Portfolio</a>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero">
+  <div class="hero-banner">
+    <!-- Replace with your own screenshot: <img class="hero-banner-img" src="YOUR-IMAGE.jpg" alt=""> -->
+  </div>
+  <div class="hero-scrim"></div>
+  <div class="hero-content wrap">
+    <span class="hero-status" style="background: rgba(20,16,10,0.6);"><span class="status-dot" style="background:#a8a3b4; box-shadow:none;"></span>Completed</span>
+    <h1 class="hero-title">💰 Expense Tracker</h1>
+    <p class="hero-tagline">A full-stack MERN application for logging, categorizing, and managing personal expenses with a complete authenticated CRUD workflow.</p>
+  </div>
+</header>
+
+<!-- ============================================================
+     QUICK INFO STRIP
+     ============================================================ -->
+<section class="info-strip wrap">
+  <div class="info-grid">
+    <div class="glass-card info-card">
+      <span class="info-label">Duration</span>
+      <span class="info-value">Aug 2025 – Oct 2025</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Role</span>
+      <span class="info-value">Full Stack Developer</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Project Type</span>
+      <span class="info-value">Personal Project</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Category</span>
+      <span class="info-value">Web Application</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Technology</span>
+      <span class="info-value">MERN Stack</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Status</span>
+      <span class="info-value">Completed</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROJECT OVERVIEW
+     ============================================================ -->
+<section id="overview" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Project Overview</h2>
+    <div class="section-underline"></div>
+    <div class="glass-card prose-card">
+      <p>Expense Tracker is a full-stack MERN application that gives users a simple, secure way to log and manage their personal spending. After signing up or logging in, a user can record an expense with a title, amount, category, date, and optional notes — covering everyday spending like food, transportation, bills, or entertainment — and immediately see it reflected in their dashboard.</p>
+      <p>I built it to get hands-on with a complete authenticated CRUD application end to end: user accounts, protected routes, a REST API backed by MongoDB, and a responsive frontend that makes adding and reviewing expenses fast rather than tedious.</p>
+      <p>It's built for anyone who wants a lightweight, no-frills way to track where their money is going — without the complexity of a full budgeting platform.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROBLEM STATEMENT
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Problem Statement</h2>
+    <div class="section-underline"></div>
+    <div class="glass-card prose-card">
+      <p>Most people don't have a clear picture of where their money actually goes each month. Tracking spending manually in a notebook or spreadsheet is tedious enough that most people give up on it within a few weeks, which means small, recurring expenses go unnoticed until they add up to a real problem.</p>
+      <p>Existing budgeting apps often solve this by overcomplicating it — bank integrations, subscription tiers, and dense dashboards that create friction rather than removing it. For someone who just wants to log an expense in a few seconds and see a clean history afterward, that complexity gets in the way.</p>
+      <p>Expense Tracker was built to address exactly that gap: a fast, distraction-free way to add, categorize, and review expenses, with full account security so each user's financial data stays private to them.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     OBJECTIVES
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Objectives</h2>
+    <div class="section-underline"></div>
+    <div class="objectives-grid">
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Secure user accounts with authentication</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Log expenses in seconds with a simple form</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Categorize spending by type (food, transport, and more)</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Support full CRUD — add, view, edit, and delete</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Present a clear, scannable dashboard of past expenses</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Keep the interface responsive across devices</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROJECT WORKFLOW
+     ============================================================ -->
+<section id="workflow" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Project Workflow</h2>
+    <div class="section-underline"></div>
+    <div class="workflow">
+      <div class="glass-card workflow-step">🔐 Sign Up / Login</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">📝 Add Expense (Title, Amount, Category, Date, Notes)</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">💾 Save to Database</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">📋 View Expense List</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">✏️ Edit or 🗑️ Delete Entry</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURES
+     ============================================================ -->
+<section id="features" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Features</h2>
+    <div class="section-underline"></div>
+    <div class="features-grid">
+      <div class="glass-card feature-card">
+        <span class="feature-icon">🔐</span>
+        <h4 class="feature-title">User Authentication</h4>
+        <p class="feature-desc">Secure sign-up and login so every user's expense data stays private.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">📝</span>
+        <h4 class="feature-title">Quick Expense Entry</h4>
+        <p class="feature-desc">Add a title, amount, category, date, and notes in one simple form.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">🏷️</span>
+        <h4 class="feature-title">Expense Categorization</h4>
+        <p class="feature-desc">Organizes spending into categories like food, transportation, and more.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">📋</span>
+        <h4 class="feature-title">Expense Dashboard</h4>
+        <p class="feature-desc">See every logged expense in one clean, scannable list.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">✏️</span>
+        <h4 class="feature-title">Full CRUD Operations</h4>
+        <p class="feature-desc">Add, view, edit, and delete any expense entry at any time.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">📱</span>
+        <h4 class="feature-title">Responsive Interface</h4>
+        <p class="feature-desc">Works smoothly across desktop, tablet, and mobile screens.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TECHNOLOGY STACK
+     ============================================================ -->
+<section id="stack" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Technology Stack</h2>
+    <div class="section-underline"></div>
+    <div class="stack-grid">
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Frontend</span>
+        <div class="stack-pills"><span class="stack-pill">React</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Backend</span>
+        <div class="stack-pills"><span class="stack-pill">Node.js</span><span class="stack-pill">Express.js</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Database</span>
+        <div class="stack-pills"><span class="stack-pill">MongoDB</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Authentication</span>
+        <div class="stack-pills"><span class="stack-pill">JWT</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">API</span>
+        <div class="stack-pills"><span class="stack-pill">REST API</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Tools</span>
+        <div class="stack-pills"><span class="stack-pill">Git</span><span class="stack-pill">GitHub</span><span class="stack-pill">Postman</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SYSTEM ARCHITECTURE
+     ============================================================ -->
+<section id="architecture" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">System Architecture</h2>
+    <div class="section-underline"></div>
+    <div class="arch-flow">
+      <div class="arch-node">User (Browser)</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node emphasis">React Frontend</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">REST API Calls</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node emphasis">Node.js + Express Backend</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">JWT Authentication Middleware</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">MongoDB Database</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Expense Records</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     IMPLEMENTATION
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Implementation</h2>
+    <div class="section-underline"></div>
+    <div class="modules-list">
+      <div class="glass-card module-item">
+        <span class="module-index">01</span>
+        <div class="module-body">
+          <h4>Authentication Module</h4>
+          <p>Handles user sign-up and login, issuing a JWT on successful authentication and protecting all expense routes behind it.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">02</span>
+        <div class="module-body">
+          <h4>Expense Form Module</h4>
+          <p>Captures title, amount, category, date, and notes on the frontend, validates the input, and sends it to the API.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">03</span>
+        <div class="module-body">
+          <h4>API Module</h4>
+          <p>Exposes REST endpoints for creating, reading, updating, and deleting expenses, each scoped to the logged-in user.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">04</span>
+        <div class="module-body">
+          <h4>Database Module</h4>
+          <p>Stores users and their expenses in MongoDB, with each expense document linked back to its owner.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">05</span>
+        <div class="module-body">
+          <h4>Dashboard Module</h4>
+          <p>Fetches and renders the user's expense list, supporting inline edit and delete actions without a full page reload.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHALLENGES FACED
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Challenges Faced</h2>
+    <div class="section-underline"></div>
+    <div class="challenges-grid">
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">🔐 Secure Authentication</h4>
+        <p class="challenge-desc">Implementing JWT-based auth correctly — token storage, expiry, and protected routes — took careful handling to avoid security gaps.</p>
+      </div>
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">🔄 Real-Time CRUD Sync</h4>
+        <p class="challenge-desc">Keeping the frontend list in sync after every add, edit, or delete without a full page refresh required careful state management.</p>
+      </div>
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">🏷️ Category Consistency</h4>
+        <p class="challenge-desc">Designing a category system flexible enough for varied spending types while staying simple to filter and report on.</p>
+      </div>
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">📱 Responsive Layout</h4>
+        <p class="challenge-desc">Making the expense form and dashboard equally usable on small mobile screens as on desktop.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MY CONTRIBUTIONS
+     ============================================================ -->
+<section id="contributions" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">My Contributions</h2>
+    <div class="section-underline"></div>
+    <div class="glass-card" style="padding: 24px 26px;">
+      <div class="contrib-list">
+        <div class="contrib-item"><span class="contrib-dot"></span>Designed the MongoDB schema for users and expenses</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Built the Express REST API with full CRUD endpoints</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Implemented JWT-based authentication and route protection</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Developed the React frontend and expense dashboard</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Built the add/edit expense form with validation</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Implemented category-based organization of expenses</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCREENSHOTS
+     ============================================================ -->
+
+<!-- ============================================================
+     FUTURE IMPROVEMENTS
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Future Improvements</h2>
+    <div class="section-underline"></div>
+    <div class="future-grid">
+      <div class="glass-card future-card"><span class="future-icon">📊</span>Spending Analytics</div>
+      <div class="glass-card future-card"><span class="future-icon">🎯</span>Monthly Budget Limits</div>
+      <div class="glass-card future-card"><span class="future-icon">🔔</span>Spending Alerts</div>
+      <div class="glass-card future-card"><span class="future-icon">📤</span>CSV / PDF Export</div>
+      <div class="glass-card future-card"><span class="future-icon">📱</span>Mobile App</div>
+      <div class="glass-card future-card"><span class="future-icon">🏦</span>Bank Sync</div>
+      <div class="glass-card future-card"><span class="future-icon">👥</span>Shared / Group Expenses</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     KEY LEARNINGS
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Key Learnings</h2>
+    <div class="section-underline"></div>
+    <div class="learnings-wrap">
+      <span class="learning-pill">React</span>
+      <span class="learning-pill">Node.js</span>
+      <span class="learning-pill">Express.js</span>
+      <span class="learning-pill">MongoDB</span>
+      <span class="learning-pill">REST API Design</span>
+      <span class="learning-pill">JWT Authentication</span>
+      <span class="learning-pill">State Management</span>
+      <span class="learning-pill">CRUD Architecture</span>
+      <span class="learning-pill">Responsive Design</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     GITHUB REPOSITORY
+     ============================================================ -->
+<section id="github" class="wrap">
+  <div class="reveal glass-card github-card">
+    <h3>View the Full Source Code</h3>
+    <p>Explore the complete implementation, including the Express REST API, MongoDB schema, and React frontend.</p>
+    <a class="github-btn" href="https://github.com/kowsisp47/expense-tracker-mern" target="_blank" rel="noopener">🐙 View Source Code</a>
+  </div>
+</section>
+
+<!-- ============================================================
+     BACK TO PORTFOLIO
+     ============================================================ -->
+<footer class="back-footer wrap">
+  <a class="back-link" href="index.html">⬅ Back to Portfolio</a>
+</footer>
+
+<script>
+  // ============================================================
+  // Scroll-reveal animation for each section — vanilla JS,
+  // no dependencies. Adds .is-visible once a section enters
+  // the viewport so the CSS transition can fade/slide it in.
+  // ============================================================
+  (function initScrollReveal(){
+    const revealEls = document.querySelectorAll('.reveal');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    revealEls.forEach((el) => observer.observe(el));
+  })();
+</script>
+
+</body>
+</html>
