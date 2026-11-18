@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Accounting System — Project Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  /* ============================================================
+     TOKENS — shared with the Projects grid for visual consistency
+     ============================================================ */
+  :root{
+    --bg:            #0a0a12;
+    --surface:       rgba(255,255,255,0.035);
+    --surface-2:     rgba(255,255,255,0.05);
+    --border:        rgba(255,255,255,0.09);
+    --border-hover:  rgba(255,46,99,0.5);
+    --pink:          #ff2e63;
+    --pink-soft:     rgba(255,46,99,0.12);
+    --violet:        #6c2bd9;
+    --green:         #35e07a;
+    --text:          #f4f2f6;
+    --text-dim:      #a8a3b4;
+    --text-faint:    #6e6a7c;
+    --radius-lg:     22px;
+    --radius-md:     14px;
+    --radius-sm:     999px;
+    --font-display:  'Space Grotesk', sans-serif;
+    --font-body:     'Inter', sans-serif;
+    --font-mono:     'JetBrains Mono', monospace;
+    --ease:          cubic-bezier(0.22, 1, 0.36, 1);
+    --maxw:          1080px;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 10% 0%, rgba(108,43,217,0.14), transparent 55%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(255,46,99,0.10), transparent 50%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  a{ color: inherit; text-decoration: none; }
+
+  .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  .reveal{
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  }
+  .reveal.is-visible{ opacity: 1; transform: translateY(0); }
+
+  section{ padding: 88px 0; }
+  @media (max-width: 720px){ section{ padding: 60px 0; } }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--pink);
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .section-title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+    letter-spacing: -0.01em;
+    margin-top: 46px;
+  }
+
+  .section-underline{
+    width: 60px; height: 3px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--pink), rgba(255,46,99,0.1));
+    box-shadow: 0 0 14px rgba(255,46,99,0.5);
+    margin-bottom: 40px;
+  }
+
+  .section-lede{
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 640px;
+    margin-bottom: 36px;
+    line-height: 1.7;
+  }
+
+  .glass-card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  }
+  .glass-card:hover{
+    transform: translateY(-4px);
+    border-color: var(--border-hover);
+    box-shadow: 0 14px 34px rgba(255,46,99,0.14);
+  }
+
+  /* ============================================================
+     STICKY MINI NAV
+     ============================================================ */
+  .mini-nav{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10,10,18,0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mini-nav-inner{
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .mini-nav-brand{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .mini-nav-links{
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .mini-nav-links::-webkit-scrollbar{ display: none; }
+
+  .mini-nav-links a{
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-dim);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: color 0.25s var(--ease), background 0.25s var(--ease);
+  }
+  .mini-nav-links a:hover{ color: var(--text); background: var(--surface-2); }
+
+  .mini-nav-back{
+    flex-shrink: 0;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+  }
+  .mini-nav-back:hover{ border-color: var(--pink); background: var(--pink-soft); }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero{
+    position: relative;
+    padding: 0;
+    height: 62vh;
+    min-height: 420px;
+    max-height: 560px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  .hero-banner{
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 25% 20%, rgba(255,46,99,0.4), transparent 55%),
+      radial-gradient(circle at 80% 75%, rgba(108,43,217,0.35), transparent 55%),
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 30px),
+      linear-gradient(160deg, #22091a, #0a0710 75%);
+  }
+
+  .hero-banner-img{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+    mix-blend-mode: luminosity;
+  }
+
+  .hero-scrim{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10,10,18,0.15) 0%, rgba(10,10,18,0.55) 55%, var(--bg) 100%);
+  }
+
+  .hero-content{
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding-bottom: 44px;
+  }
+
+  .hero-status{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    background: rgba(20,10,16,0.6);
+    border: 1px solid rgba(255,255,255,0.16);
+    backdrop-filter: blur(10px);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+
+  .status-dot{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px rgba(53,224,122,0.9);
+  }
+
+  .hero-title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+  }
+
+  .hero-tagline{
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    color: var(--text-dim);
+    max-width: 560px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  /* ============================================================
+     QUICK INFO CARDS
+     ============================================================ */
+  .info-strip{
+    padding: 44px 0 0;
+  }
+
+  .info-grid{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+  }
+
+  @media (max-width: 900px){ .info-grid{ grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px){ .info-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+  .info-card{
+    padding: 18px 16px;
+    text-align: left;
+  }
+
+  .info-label{
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 8px;
+  }
+
+  .info-value{
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  /* ============================================================
+     PROSE SECTIONS (Overview / Problem Statement)
+     ============================================================ */
+  .prose-card{
+    padding: 32px 34px;
+  }
+
+  .prose-card p{
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--text-dim);
+  }
+
+  .prose-card p + p{ margin-top: 16px; }
+
+  /* ============================================================
+     OBJECTIVES
+     ============================================================ */
+  .objectives-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 640px){ .objectives-grid{ grid-template-columns: 1fr; } }
+
+  .objective-item{
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px 20px;
+  }
+
+  .objective-check{
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--pink-soft);
+    border: 1px solid rgba(255,46,99,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    color: var(--pink);
+  }
+
+  .objective-text{ font-size: 14px; color: var(--text); line-height: 1.5; padding-top: 3px; }
+
+  /* ============================================================
+     WORKFLOW (vertical flow)
+     ============================================================ */
+  .workflow{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .workflow-step{
+    width: 100%;
+    max-width: 420px;
+    padding: 16px 22px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .workflow-arrow{
+    font-family: var(--font-mono);
+    color: var(--pink);
+    font-size: 18px;
+    padding: 10px 0;
+    opacity: 0.8;
+  }
+
+  /* ============================================================
+     FEATURES
+     ============================================================ */
+  .features-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px){ .features-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .features-grid{ grid-template-columns: 1fr; } }
+
+  .feature-card{
+    padding: 24px 22px;
+  }
+
+  .feature-icon{ font-size: 26px; margin-bottom: 14px; display: block; }
+  .feature-title{ font-family: var(--font-display); font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+  .feature-desc{ font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ============================================================
+     TECH STACK
+     ============================================================ */
+  .stack-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px){ .stack-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .stack-grid{ grid-template-columns: 1fr; } }
+
+  .stack-card{ padding: 20px 20px 22px; }
+
+  .stack-cat{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 12px;
+  }
+
+  .stack-pills{ display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .stack-pill{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 6px 13px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255,46,99,0.4);
+    background: rgba(255,46,99,0.07);
+    color: #ffc0d2;
+  }
+
+  /* ============================================================
+     ARCHITECTURE (vertical flow, distinct styling from workflow)
+     ============================================================ */
+  .arch-flow{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .arch-node{
+    width: 100%;
+    max-width: 460px;
+    padding: 16px 22px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: linear-gradient(180deg, rgba(255,46,99,0.06), rgba(108,43,217,0.05));
+  }
+
+  .arch-node.emphasis{
+    border-color: rgba(255,46,99,0.55);
+    box-shadow: 0 0 22px rgba(255,46,99,0.18);
+  }
+
+  .arch-arrow{
+    color: var(--pink);
+    font-size: 16px;
+    padding: 8px 0;
+    opacity: 0.75;
+  }
+
+  /* ============================================================
+     IMPLEMENTATION MODULES
+     ============================================================ */
+  .modules-list{ display: flex; flex-direction: column; gap: 14px; }
+
+  .module-item{
+    display: flex;
+    gap: 18px;
+    padding: 20px 22px;
+    align-items: flex-start;
+  }
+
+  .module-index{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--pink);
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .module-body h4{
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .module-body p{
+    font-size: 13.3px;
+    color: var(--text-dim);
+    line-height: 1.65;
+  }
+
+  /* ============================================================
+     CHALLENGES
+     ============================================================ */
+  .challenges-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 640px){ .challenges-grid{ grid-template-columns: 1fr; } }
+
+  .challenge-card{ padding: 22px 22px; }
+  .challenge-title{ font-family: var(--font-display); font-weight: 600; font-size: 14.5px; margin-bottom: 8px; display:flex; align-items:center; gap:8px; }
+  .challenge-desc{ font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ============================================================
+     CONTRIBUTIONS
+     ============================================================ */
+  .contrib-list{ display: flex; flex-direction: column; gap: 10px; }
+
+  .contrib-item{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    font-size: 13.8px;
+  }
+
+  .contrib-dot{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--pink);
+    box-shadow: 0 0 8px rgba(255,46,99,0.7);
+    flex-shrink: 0;
+  }
+
+  /* ============================================================
+     SCREENSHOTS
+     ============================================================ */
+  
+  /* ============================================================
+     FUTURE IMPROVEMENTS
+     ============================================================ */
+  .future-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 900px){ .future-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .future-grid{ grid-template-columns: 1fr; } }
+
+  .future-card{
+    padding: 18px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+
+  .future-icon{ font-size: 18px; }
+
+  /* ============================================================
+     KEY LEARNINGS
+     ============================================================ */
+  .learnings-wrap{ display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .learning-pill{
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .learning-pill:hover{
+    border-color: var(--pink);
+    background: var(--pink-soft);
+    transform: translateY(-2px);
+  }
+
+  /* ============================================================
+     GITHUB CTA
+     ============================================================ */
+  .github-card{
+    padding: 46px 40px;
+    text-align: center;
+    background: linear-gradient(160deg, rgba(255,46,99,0.09), rgba(108,43,217,0.07));
+    border: 1px solid rgba(255,46,99,0.3);
+  }
+
+  .github-card h3{
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .github-card p{
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 26px;
+  }
+
+  .github-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 28px;
+    border-radius: var(--radius-sm);
+    background: var(--pink);
+    color: #150710;
+    font-weight: 600;
+    font-size: 14.5px;
+    box-shadow: 0 0 26px rgba(255,46,99,0.4);
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  }
+  .github-btn:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 0 36px rgba(255,46,99,0.55);
+  }
+
+  /* ============================================================
+     BACK TO PORTFOLIO (footer)
+     ============================================================ */
+  .back-footer{
+    padding: 50px 0 90px;
+    text-align: center;
+  }
+
+  .back-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .back-link:hover{
+    border-color: var(--pink);
+    background: var(--pink-soft);
+    transform: translateY(-2px);
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     STICKY MINI NAVIGATION
+     ============================================================ -->
+<nav class="mini-nav">
+  <div class="mini-nav-inner">
+    <span class="mini-nav-brand">📊 Shop Accounting System</span>
+    <div class="mini-nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#workflow">Process</a>
+      <a href="#features">Features</a>
+      <a href="#stack">Tools</a>
+      <a href="#architecture">System Flow</a>
+      <a href="#contributions">Contributions</a>
+      <a href="#github">Project Report</a>
+    </div>
+    <a class="mini-nav-back" href="index.html">← Portfolio</a>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero">
+  <div class="hero-banner">
+    <!-- Replace with your own screenshot: <img class="hero-banner-img" src="YOUR-IMAGE.jpg" alt=""> -->
+  </div>
+  <div class="hero-scrim"></div>
+  <div class="hero-content wrap">
+    <span class="hero-status" style="background: rgba(20,16,10,0.6);"><span class="status-dot" style="background:#a8a3b4; box-shadow:none;"></span>Completed</span>
+    <h1 class="hero-title">📊 Shop Management & Accounting System</h1>
+    <p class="hero-tagline">A complete Tally ERP 9 accounting implementation with GST for Sako&amp;Saru Traders, a herbal products retailer — from company setup to financial reporting.</p>
+  </div>
+</header>
+
+<!-- ============================================================
+     QUICK INFO STRIP
+     ============================================================ -->
+<section class="info-strip wrap">
+  <div class="info-grid">
+    <div class="glass-card info-card">
+      <span class="info-label">Duration</span>
+      <span class="info-value">Apr 2023 – Mar 2024</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Role</span>
+      <span class="info-value">Accounts &amp; Tally Executive</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Project Type</span>
+      <span class="info-value">Academic Project</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Category</span>
+      <span class="info-value">Accounting &amp; ERP</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Technology</span>
+      <span class="info-value">Tally ERP 9 + GST</span>
+    </div>
+    <div class="glass-card info-card">
+      <span class="info-label">Status</span>
+      <span class="info-value">Completed</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROJECT OVERVIEW
+     ============================================================ -->
+<section id="overview" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Project Overview</h2>
+    <div class="section-underline"></div>
+    <div class="glass-card prose-card">
+      <p>This project is a complete accounting implementation built in Tally ERP 9 for Sako&amp;Saru Traders, a herbal products retailer based in Virudhunagar, Tamil Nadu, dealing in items like neem leaf, basil leaf, guava leaf, and other herbal products. Rather than custom-built software, the deliverable here is a fully configured, GST-compliant accounting system set up end-to-end inside Tally — from company creation through to final financial statements.</p>
+      <p>I built this to get hands-on, practical experience with how a real small business manages its books using industry-standard accounting software. It covers the full cycle: setting up the company profile, enabling GST, creating inventory structures for the shop's herbal products, recording day-to-day sales and purchase transactions, and generating the financial reports a business owner or auditor would actually need.</p>
+      <p>It's directly relevant to small and medium retail businesses that need accurate, GST-compliant bookkeeping without investing in a large enterprise ERP system — Tally ERP 9 remains one of the most widely used accounting platforms for exactly this kind of business in India.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROBLEM STATEMENT
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Problem Statement</h2>
+    <div class="section-underline"></div>
+    <div class="glass-card prose-card">
+      <p>Small retail businesses like Sako&amp;Saru Traders traditionally maintained accounts manually — recording sales, purchases, and expenses by hand in ledgers. This approach is slow, error-prone, and makes it difficult to produce accurate financial statements when they're needed, whether for tax filing, loan applications, or simply understanding how the business is performing.</p>
+      <p>GST compliance adds another layer of difficulty: every sale and purchase needs the correct tax rate applied and recorded separately as CGST and SGST, and errors here can lead to compliance issues. Manually tracking inventory alongside accounts — knowing exactly how much stock of each herbal product remains and what it's worth — is even harder to keep accurate over time.</p>
+      <p>Computerizing the accounting process with Tally ERP 9 addresses all of this directly: transactions are recorded once through structured vouchers, GST is calculated automatically, stock levels update in real time, and financial reports like the Trial Balance, Profit &amp; Loss Account, and Balance Sheet can be generated instantly rather than compiled by hand.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     OBJECTIVES
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Objectives</h2>
+    <div class="section-underline"></div>
+    <div class="objectives-grid">
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Set up a fully configured company profile in Tally ERP 9</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Enable and correctly apply GST across all transactions</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Structure inventory using stock groups and stock items</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Record accurate sales, purchase, payment, and receipt vouchers</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Maintain clean, reconciled ledger accounts</span></div>
+      <div class="glass-card objective-item"><span class="objective-check">✓</span><span class="objective-text">Generate accurate Trial Balance, P&amp;L, and Balance Sheet reports</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROJECT WORKFLOW
+     ============================================================ -->
+<section id="workflow" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Implementation Process</h2>
+    <div class="section-underline"></div>
+    <div class="workflow">
+      <div class="glass-card workflow-step">🏢 Company Creation</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">🧾 GST Configuration</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">📦 Stock Groups &amp; Stock Items Setup</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">📒 Ledger Account Creation</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">🧮 Voucher Entry (Sales, Purchase, Payment, Receipt)</div>
+      <div class="workflow-arrow">↓</div>
+      <div class="glass-card workflow-step">📊 Financial Reports (Trial Balance, P&amp;L, Balance Sheet)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURES
+     ============================================================ -->
+<section id="features" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Features</h2>
+    <div class="section-underline"></div>
+    <div class="features-grid">
+      <div class="glass-card feature-card">
+        <span class="feature-icon">🏢</span>
+        <h4 class="feature-title">Company Setup</h4>
+        <p class="feature-desc">Complete company profile with address, financial year, and base currency configuration.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">🧾</span>
+        <h4 class="feature-title">GST Compliance</h4>
+        <p class="feature-desc">CGST and SGST configured and applied automatically across every transaction.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">📦</span>
+        <h4 class="feature-title">Inventory Management</h4>
+        <p class="feature-desc">Stock groups and stock items track every herbal product and its quantity.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">📒</span>
+        <h4 class="feature-title">Ledger Accounts</h4>
+        <p class="feature-desc">Structured ledgers for cash, sales, purchases, and expenses.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">🧮</span>
+        <h4 class="feature-title">Voucher Entry</h4>
+        <p class="feature-desc">Sales, purchase, payment, and receipt vouchers recorded with full GST breakdown.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <span class="feature-icon">📊</span>
+        <h4 class="feature-title">Financial Reporting</h4>
+        <p class="feature-desc">Instant Trial Balance, Profit &amp; Loss, and Balance Sheet generation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TECHNOLOGY STACK
+     ============================================================ -->
+<section id="stack" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Tools &amp; Standards</h2>
+    <div class="section-underline"></div>
+    <div class="stack-grid">
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Accounting Software</span>
+        <div class="stack-pills"><span class="stack-pill">Tally ERP 9</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Taxation</span>
+        <div class="stack-pills"><span class="stack-pill">GST</span><span class="stack-pill">CGST</span><span class="stack-pill">SGST</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Core Modules</span>
+        <div class="stack-pills"><span class="stack-pill">Accounting Info</span><span class="stack-pill">Inventory Info</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Vouchers Used</span>
+        <div class="stack-pills"><span class="stack-pill">Sales</span><span class="stack-pill">Purchase</span><span class="stack-pill">Payment</span><span class="stack-pill">Receipt</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Reports Generated</span>
+        <div class="stack-pills"><span class="stack-pill">Trial Balance</span><span class="stack-pill">P&amp;L A/c</span><span class="stack-pill">Balance Sheet</span></div>
+      </div>
+      <div class="glass-card stack-card">
+        <span class="stack-cat">Currency</span>
+        <div class="stack-pills"><span class="stack-pill">INR (₹)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SYSTEM ARCHITECTURE
+     ============================================================ -->
+<section id="architecture" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">System Flow</h2>
+    <div class="section-underline"></div>
+    <div class="arch-flow">
+      <div class="arch-node">Company Profile (Sako&amp;Saru Traders)</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node emphasis">GST &amp; Taxation Setup</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Stock Groups &amp; Stock Items</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Ledger Accounts</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node emphasis">Sales / Purchase / Payment / Receipt Vouchers</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Automatic GST Tax Computation</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Trial Balance</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Profit &amp; Loss / Balance Sheet</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     IMPLEMENTATION
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Implementation</h2>
+    <div class="section-underline"></div>
+    <div class="modules-list">
+      <div class="glass-card module-item">
+        <span class="module-index">01</span>
+        <div class="module-body">
+          <h4>Company Setup</h4>
+          <p>Created the Sako&amp;Saru Traders company profile in Tally ERP 9 with full mailing details, financial year, and base currency information.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">02</span>
+        <div class="module-body">
+          <h4>GST Configuration</h4>
+          <p>Enabled Goods and Services Tax under Statutory &amp; Taxation features and configured the applicable GSTIN, registration type, and tax rates.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">03</span>
+        <div class="module-body">
+          <h4>Inventory Setup</h4>
+          <p>Created stock groups (such as "Leaves") and individual stock items for each herbal product, each with its own unit of measure and GST classification.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">04</span>
+        <div class="module-body">
+          <h4>Ledger Creation</h4>
+          <p>Set up ledger accounts for cash, sales, purchases, and expenses to correctly classify every transaction recorded in the system.</p>
+        </div>
+      </div>
+      <div class="glass-card module-item">
+        <span class="module-index">05</span>
+        <div class="module-body">
+          <h4>Voucher Entry &amp; Reporting</h4>
+          <p>Recorded sales and purchase vouchers with GST applied, then generated the Trial Balance, Profit &amp; Loss Account, and Balance Sheet from the accumulated data.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHALLENGES FACED
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Challenges Faced</h2>
+    <div class="section-underline"></div>
+    <div class="challenges-grid">
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">🧾 GST Rate Accuracy</h4>
+        <p class="challenge-desc">Applying the correct CGST and SGST rates to each herbal product category required careful attention to tax classification rules.</p>
+      </div>
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">📦 Stock Valuation</h4>
+        <p class="challenge-desc">Keeping opening balances, purchases, and sales quantities consistent so closing stock values matched real inventory.</p>
+      </div>
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">📒 Ledger Reconciliation</h4>
+        <p class="challenge-desc">Ensuring every voucher entry posted to the correct ledger so the Trial Balance would tally without discrepancies.</p>
+      </div>
+      <div class="glass-card challenge-card">
+        <h4 class="challenge-title">🧮 Voucher Formatting</h4>
+        <p class="challenge-desc">Learning the correct voucher type and entry format for each transaction type — sales, purchase, payment, and receipt.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MY CONTRIBUTIONS
+     ============================================================ -->
+<section id="contributions" class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">My Contributions</h2>
+    <div class="section-underline"></div>
+    <div class="glass-card" style="padding: 24px 26px;">
+      <div class="contrib-list">
+        <div class="contrib-item"><span class="contrib-dot"></span>Created the complete company profile for Sako&amp;Saru Traders in Tally ERP 9</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Enabled and configured GST, including CGST and SGST rates</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Created stock groups and stock items for every herbal product</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Set up ledger accounts for cash, sales, purchases, and expenses</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Recorded sales and purchase vouchers with accurate GST breakdown</div>
+        <div class="contrib-item"><span class="contrib-dot"></span>Generated and verified the Trial Balance, P&amp;L Account, and Balance Sheet</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCREENSHOTS
+     ============================================================ -->
+
+<!-- ============================================================
+     FUTURE IMPROVEMENTS
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Future Improvements</h2>
+    <div class="section-underline"></div>
+    <div class="future-grid">
+      <div class="glass-card future-card"><span class="future-icon">☁️</span>Cloud-Based Tally (TallyPrime)</div>
+      <div class="glass-card future-card"><span class="future-icon">📱</span>Mobile Reporting Access</div>
+      <div class="glass-card future-card"><span class="future-icon">🧾</span>Automated GST Return Filing</div>
+      <div class="glass-card future-card"><span class="future-icon">📈</span>Ratio Analysis Dashboards</div>
+      <div class="glass-card future-card"><span class="future-icon">🔗</span>Bank Reconciliation Integration</div>
+      <div class="glass-card future-card"><span class="future-icon">👥</span>Multi-User Access Control</div>
+      <div class="glass-card future-card"><span class="future-icon">🗂️</span>Digital Document Archival</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     KEY LEARNINGS
+     ============================================================ -->
+<section class="wrap">
+  <div class="reveal">
+    <h2 class="section-title">Key Learnings</h2>
+    <div class="section-underline"></div>
+    <div class="learnings-wrap">
+      <span class="learning-pill">Tally ERP 9</span>
+      <span class="learning-pill">GST Compliance</span>
+      <span class="learning-pill">Financial Accounting</span>
+      <span class="learning-pill">Inventory Management</span>
+      <span class="learning-pill">Ledger Reconciliation</span>
+      <span class="learning-pill">Voucher Entry</span>
+      <span class="learning-pill">Financial Statement Analysis</span>
+      <span class="learning-pill">Attention to Detail</span>
+      <span class="learning-pill">Business Process Understanding</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     GITHUB REPOSITORY
+     ============================================================ -->
+<section id="github" class="wrap">
+  <div class="reveal glass-card github-card">
+    <h3>View the Full Project Report</h3>
+    <p>The complete documentation covers company setup, GST configuration, inventory, ledgers, vouchers, and every financial statement generated for Sako&amp;Saru Traders.</p>
+    <a class="github-btn" href="#" target="_blank" rel="noopener">📄 View Project Report</a>
+  </div>
+</section>
+
+<!-- ============================================================
+     BACK TO PORTFOLIO
+     ============================================================ -->
+<footer class="back-footer wrap">
+  <a class="back-link" href="index.html">⬅ Back to Portfolio</a>
+</footer>
+
+<script>
+  // ============================================================
+  // Scroll-reveal animation for each section — vanilla JS,
+  // no dependencies. Adds .is-visible once a section enters
+  // the viewport so the CSS transition can fade/slide it in.
+  // ============================================================
+  (function initScrollReveal(){
+    const revealEls = document.querySelectorAll('.reveal');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    revealEls.forEach((el) => observer.observe(el));
+  })();
+</script>
+
+</body>
+</html>
